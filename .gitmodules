@@ -1,0 +1,3 @@
+[submodule "ansible-for-nsxt"]
+	path = ansible-for-nsxt
+	url = https://github.com/laidbackware/ansible-for-nsxt.git

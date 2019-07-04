@@ -1,0 +1,96 @@
+---
+hostname: '192.168.0.183'
+username: 'admin' # NSX Manager
+password: 'Pass123$123$' # NSX Manager
+validate_certs: False
+
+nsxt_ns_groups:
+- display_name: 'ns-nodes-<cluster_id>'
+  membership_criteria:
+  - resource_type: NSGroupTagExpression
+    target_type: 'LogicalSwitch'
+    scope: 'pks/cluster'
+    tag: '<cluster_id>'
+  state: present
+
+- display_name: 'ns-kube-system-<cluster_id>'
+  membership_criteria:
+  - resource_type: NSGroupComplexExpression
+    expressions:
+    - resource_type: NSGroupTagExpression
+      target_type: 'LogicalPort'
+      scope: 'ncp/project'
+      tag: 'kube-system'
+    - resource_type: NSGroupTagExpression
+      target_type: 'LogicalPort'
+      scope: 'ncp/cluster'
+      tag: 'pks-<cluster_id>'
+  state: present
+
+- display_name: 'ns-pks-system-<cluster_id>'
+  membership_criteria:
+  - resource_type: NSGroupComplexExpression
+    expressions:
+    - resource_type: NSGroupTagExpression
+      target_type: 'LogicalPort'
+      scope: 'ncp/project'
+      tag: 'pks-system'
+    - resource_type: NSGroupTagExpression
+      target_type: 'LogicalPort'
+      scope: 'ncp/cluster'
+      tag: 'pks-<cluster_id>'
+  state: present
+
+
+nsxt_dfw_section_with_rules:
+- display_name: PKS_Cluster_<cluster_id>
+  state: present
+  section_placement:
+    operation: insert_top
+  rules:
+  - display_name: 'nodes_to_nodes_<cluster_id>'
+    action: ALLOW
+    sources: 
+    - target_display_name: ns-nodes-<cluster_id>
+      target_type: NSGroup
+    destinations:
+    - target_display_name: ns-nodes-<cluster_id>
+      target_type: NSGroup
+
+  - display_name: 'nodes_to_kube_system_<cluster_id>'
+    action: ALLOW
+    sources: 
+    - target_display_name: ns-nodes-<cluster_id>
+      target_type: NSGroup
+    destinations:
+    - target_display_name: ns-kube-system-<cluster_id>
+      target_type: NSGroup
+
+  - display_name: 'system_ns_to_nodes_<cluster_id>'
+    action: ALLOW
+    sources: 
+    - target_display_name: ns-kube-system-<cluster_id>
+      target_type: NSGroup
+    - target_display_name: ns-pks-system-<cluster_id>
+      target_type: NSGroup
+    destinations:
+    - target_display_name: ns-nodes-<cluster_id>
+      target_type: NSGroup
+
+  - display_name: 'kube_system_to_kube_system_<cluster_id>'
+    action: ALLOW
+    sources: 
+    - target_display_name: ns-kube-system-<cluster_id>
+      target_type: NSGroup
+    destinations:
+    - target_display_name: ns-kube-system-<cluster_id>
+      target_type: NSGroup
+
+  - display_name: 'pks_system_to_kube_system_<cluster_id>'
+    action: ALLOW
+    sources: 
+    - target_display_name: ns-pks-system-<cluster_id>
+      target_type: NSGroup
+    destinations:
+    - target_display_name: ns-kube-system-<cluster_id>
+      target_type: NSGroup
