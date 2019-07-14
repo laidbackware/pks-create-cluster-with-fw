@@ -66,17 +66,6 @@ nsxt_dfw_section_with_rules:
     - target_display_name: ns-kube-system-<cluster_id>
       target_type: NSGroup
 
-  # - display_name: 'system_ns_to_nodes_<cluster_id>'
-  #   action: ALLOW
-  #   sources: 
-  #   - target_display_name: ns-kube-system-<cluster_id>
-  #     target_type: NSGroup
-  #   - target_display_name: ns-pks-system-<cluster_id>
-  #     target_type: NSGroup
-  #   destinations:
-  #   - target_display_name: ns-nodes-<cluster_id>
-  #     target_type: NSGroup
-
   - display_name: 'kube_system_to_kube_system_<cluster_id>'
     action: ALLOW
     sources: 
