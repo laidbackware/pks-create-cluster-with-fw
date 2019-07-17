@@ -21,4 +21,4 @@ sed -i "s/<cluster_id>/${CLUSTER_ID}/g" ${CLUSTER_RULES_FILE}
 
 export ANSIBLE_LIBRARY="${PWD}/ansible-for-nsxt"
 export ANSIBLE_MODULE_UTILS="${PWD}/ansible-for-nsxt/module_utils"
-ansible-playbook nsgroup_firewall_section.yml --extra-vars="@${CLUSTER_RULES_FILE}" #-vvv
+ansible-playbook nsgroup_firewall_create.yml --extra-vars="@${CLUSTER_RULES_FILE}" #-vvv
